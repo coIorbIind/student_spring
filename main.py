@@ -1,6 +1,7 @@
 from typing import Iterator
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -10,6 +11,38 @@ from database import SessionLocal, engine
 
 
 app = FastAPI()
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+manager = ConnectionManager()
+
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event('startup')
@@ -63,8 +96,8 @@ def get_question(question_number: int, db: Session = Depends(get_db)):
 
 
 @app.get('/get_votes/{question_number}')
-def get_votes(question_id: int, db: Session = Depends(get_db)):
-    question = crud.get_question_by_number(db, question_id)
+def get_votes(question_number: int, db: Session = Depends(get_db)):
+    question = crud.get_question_by_number(db, question_number)
     if not question:
         raise HTTPException(status_code=404, detail='Question not found')
     return question.answers
@@ -76,3 +109,10 @@ def add_votes(question_number: int, data: schemas.PutVotesSchema, db: Session = 
     if not question:
         raise HTTPException(status_code=404, detail='Question not found')
     return question.answers
+
+@app.websocket("/update_votes")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    while True:
+        data = await websocket.receive()
+        await manager.broadcast("hi")
