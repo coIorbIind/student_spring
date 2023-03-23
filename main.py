@@ -1,7 +1,10 @@
 from typing import Iterator
 
-from fastapi import Depends, FastAPI, HTTPException, WebSocket
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -11,6 +14,12 @@ from database import SessionLocal, engine
 
 
 app = FastAPI()
+
+app.mount('/static', StaticFiles(directory='./src/static'), name='static')
+
+
+templates = Jinja2Templates(directory='src')
+
 
 class ConnectionManager:
     def __init__(self):
@@ -34,14 +43,14 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-origins = ["*"]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 
@@ -110,9 +119,23 @@ def add_votes(question_number: int, data: schemas.PutVotesSchema, db: Session = 
         raise HTTPException(status_code=404, detail='Question not found')
     return question.answers
 
-@app.websocket("/update_votes")
+
+@app.websocket('/update_votes')
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
-    while True:
-        data = await websocket.receive()
-        await manager.broadcast("hi")
+    try:
+        while True:
+            await websocket.receive()
+            await manager.broadcast('hi')
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+
+@app.get('/', response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse('index.html', {'request': request})
+
+
+@app.get('/questions_page', response_class=HTMLResponse)
+async def questions_page(request: Request):
+    return templates.TemplateResponse('questions.html', {'request': request})
