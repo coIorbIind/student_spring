@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
 
+import random
 
 app = FastAPI()
 
@@ -126,7 +127,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             await websocket.receive()
-            await manager.broadcast('hook')
+            await manager.broadcast("%032x" % random.getrandbits(128))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 

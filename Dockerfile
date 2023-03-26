@@ -12,4 +12,4 @@ RUN npm install
 RUN cd front && npm run build
 RUN cd ..
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["hypercorn", "main:app", "--bind", "0.0.0.0:8000", "--reload"]
