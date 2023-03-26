@@ -9,8 +9,6 @@ services:
       - db
     ports:
       - "8000:8000"
-    volumes:
-      - './:/code'
 
   db:
     container_name: db_container
