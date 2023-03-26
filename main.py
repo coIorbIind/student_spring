@@ -16,10 +16,9 @@ import random
 
 app = FastAPI()
 
-app.mount('/static', StaticFiles(directory='./front/assets/'), name='static')
+app.mount('/assets', StaticFiles(directory='front/dist/assets/'), name='assets')
 
-
-templates = Jinja2Templates(directory='./front/dist/')
+templates = Jinja2Templates(directory='front/dist')
 
 
 class ConnectionManager:
