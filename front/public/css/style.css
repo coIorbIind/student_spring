@@ -1,14 +1,14 @@
 @charset "UTF-8";
 @font-face {
   font-family: "Montserrat";
-  src: url("/static/fonts/static/Montserrat-Medium.ttf");
+  src: url("/public/fonts/static/Montserrat-Medium.ttf");
   font-weight: 400;
   font-style: normal;
   font-size: 25px;
 }
 @font-face {
   font-family: "Cyberpunk";
-  src: url("/static/fonts/Cyberpunk.ttf");
+  src: url("/public/fonts/Cyberpunk.ttf");
   font-size: 16px;
 }
 * {
@@ -37,11 +37,11 @@ body {
 }
 
 .container {
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("/static/img/img.jpg");
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("/public/img/img.jpg");
   background-size: no-repeat;
   background-position: center;
   background-size: cover;
-  height: 1200px;
+  height: 100vh;
 }
 .container__quistion-title {
   margin: 0;
@@ -175,6 +175,10 @@ body {
   border: 3px solid #B129D3;
   filter: drop-shadow(0px 0px 30px #CE0BFF) drop-shadow(0px 0px 50px #CE0BFF) drop-shadow(0px 0px 10px #CE0BFF);
   padding: 15px;
+}
+
+.btn:hover{
+  cursor: pointer;
 }
 
 .go-btn {
@@ -317,3 +321,24 @@ body {
 .div-btn__back-btn {
   margin-right: 65%;
 }/*# sourceMappingURL=style.css.map */
+
+
+.question{
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.checkbox:hover{
+  cursor: pointer;
+}
+
+.checkbox-label:hover{
+  cursor: pointer;
+}
+
+.score{
+  color: #E6FFFD;
+  font-size: 25px;
+  margin-left: 10px;
+}

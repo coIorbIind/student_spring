@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const host = '192.168.1.76';
+	const host = '127.0.0.1'; //'192.168.1.110';
 	const main = document.getElementById("main");
 	if (!localStorage.getItem('sofa_questions')) {
 		localStorage.setItem('sofa_questions', 0);
@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	async function addDataForQuestions(num = 1) {
 		let questionNum = parseInt(localStorage.getItem('sofa_questions'))
-		console.log(num, questionNum)
 		if (num <= questionNum) {
 			data = await getQuestion(num);
 			answers = data.answers;
@@ -85,8 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					"answer": item.value,
 					"votes": 1
 				}
-				await addVotes(id, data)
-				
+				await addVotes(id, data)	
 			}
 		})
 		
@@ -110,9 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		sendMessage()
 		localStorage.setItem('sofa_questions', num);
-		// await rerender();
-
-		console.log(await response.json());
 	}
 
 	async function getVotes(num) {
@@ -132,16 +127,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		await addDataForQuestions(1);
 	}
 
-	var ws = new WebSocket(`ws://${host}:8000/update_votes`);
+	let ws = new WebSocket(`ws://${host}:8000/update_votes`);
+	console.log('Socket init', ws);
+	ws.addEventListener('close', (event) => {
+		console.log('Socket reconnect', ws, event);
+		ws = new WebSocket(`ws://${host}:8000/update_votes`);
+	})
 	ws.addEventListener('message', (event) => {
-		console.log('soket info: ', event.data)
+		console.log('soket resive: ', event.data)
 		rerender()
 	})
-	// ws.onmessage = async function() {
-	// 	console.log('it alive')
-	// 	await rerender()
-	// };
+	ws.addEventListener('error', (event) => {
+		console.log('Socket error', event);
+	})
 	function sendMessage() {
+		console.log('Soket try send', ws);
 		ws.send('hi')
 	}	
 });

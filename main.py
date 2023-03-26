@@ -15,10 +15,10 @@ from database import SessionLocal, engine
 
 app = FastAPI()
 
-app.mount('/static', StaticFiles(directory='./src/static'), name='static')
+app.mount('/static', StaticFiles(directory='./front/assets/'), name='static')
 
 
-templates = Jinja2Templates(directory='src')
+templates = Jinja2Templates(directory='./front/dist/')
 
 
 class ConnectionManager:
@@ -126,7 +126,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             await websocket.receive()
-            await manager.broadcast('hi')
+            await manager.broadcast('hook')
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
