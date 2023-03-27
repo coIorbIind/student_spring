@@ -41,7 +41,9 @@ body {
   background-size: no-repeat;
   background-position: center;
   background-size: cover;
-  height: 100vh;
+  /* height: 100vh; */
+  min-height: 100vh;
+  padding-bottom: 30px !important;
 }
 .container__quistion-title {
   margin: 0;
@@ -276,6 +278,9 @@ body {
   text-shadow: 0px 0px 1px #c90bef;
   line-height: 30px;
   filter: drop-shadow(0px 0px 30px #CE0BFF) drop-shadow(0px 0px 50px #CE0BFF) drop-shadow(0px 0px 10px #CE0BFF);
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 @media (max-width: 768px) {
   .warningBlock {
@@ -341,4 +346,15 @@ body {
   color: #E6FFFD;
   font-size: 25px;
   margin-left: 10px;
+}
+
+@media (max-width: 640px) {
+  .score {
+    margin-left: auto;
+  }
+
+
+  .preview_container{
+    height: auto;
+  }
 }
